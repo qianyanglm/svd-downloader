@@ -58,10 +58,10 @@ class Downloader:
         file_id = file.split("=")[1]
         file_path = f"{data_path}/{file_id}.wav"
         # 修改处,添加了一个请求头，添加后不是每次进行10%几就报错
-        text='Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Mobile Safari/537.36'
+        text='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36 Edg/111.0.1661.41'
 
         headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36 Edg/111.0.1661.41',
+            'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Mobile Safari/537.36',
             'Accept-Encoding': 'gzip, deflate, br', 'Accept': '*/*',
             'Connection': 'keep-alive'}
         doc = requests.get(file, headers=headers)
