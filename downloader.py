@@ -6,7 +6,8 @@ from pathlib import Path
 from logging import Logger
 from bs4 import BeautifulSoup
 from dask.diagnostics import ProgressBar
-
+# 修改处
+import time
 
 class Downloader:
     base_url = 'https://stimmdb.coli.uni-saarland.de'
@@ -47,6 +48,8 @@ class Downloader:
                             file=file
                         )
                         jobs += [job]
+                        # # 修改处，看是否是网络波动问题
+                        # time.sleep(5)
         self.logger.info("Downloading files")
         with ProgressBar():
             dask.compute(*jobs)
@@ -64,9 +67,27 @@ class Downloader:
             'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Mobile Safari/537.36',
             'Accept-Encoding': 'gzip, deflate, br', 'Accept': '*/*',
             'Connection': 'keep-alive'}
-        doc = requests.get(file, headers=headers)
-        with open(file_path, 'wb') as f:
-            f.write(doc.content)
+        #修改处
+        retries = 5  # 设置重试次数
+        for _ in range(retries):
+            try:
+                doc = requests.get(file, headers=headers)
+                if doc.status_code == 200:
+                    with open(file_path, 'wb') as f:
+                        f.write(doc.content)
+                    return  # 下载成功，退出循环
+            except requests.exceptions.RequestException as e:
+                print(f"下载文件时出现错误: {e}")
+                time.sleep(5)  # 等待一段时间后重试
+                print("重新尝试中......")
+                continue
+
+        print(f"下载文件失败: {file}")
+        return None
+
+        # doc = requests.get(file, headers=headers)
+        # with open(file_path, 'wb') as f:
+        #     f.write(doc.content)
 
     def save_all_file_links(self):
         session = self.db_session()
