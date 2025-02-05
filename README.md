@@ -8,9 +8,8 @@ py file. Without adding the request header, an error will be reported every time
 I also added an error reporting mechanism, which can automatically reapply several times, so that there will be no error. From yesterday's experiment, it can download up to 100% of the data, and automatically disconnect when downloading half of it. I have tried it twice, and I can download 100% of the data every time.
 Finally, the data downloaded by this code is not classified by disease name, but by health and disease, and then classified into men and women. This should be noted.
 
-我只是简单的改动了一点，然后可以直接在pycharm运行，而不是在命令行运行(个人不喜欢命令行)，即不用输入参数，直接运行_main_.py文件即可。（此时会在当前代码目录自动生成一个svd_downloader文件夹来保存数据集文件）
-其次修改的地方在downloader.
-py文件添加了一个请求头，不添加请求头每次下载10%几就会报错，添加以后也有可能会报错，但是可以下载的多一点再报错，比如下载到30
+我改动了一部分，然后可以直接在pycharm运行，而不是在命令行运行(个人不喜欢命令行)，即不用输入参数，直接运行_main_.py文件即可。（此时会在当前代码目录自动生成一个svd_downloader文件夹来保存数据集文件）
+其次修改的地方在downloader. py文件添加了一个请求头，不添加请求头每次下载10%几就会报错，添加以后也有可能会报错，但是可以下载的多一点再报错，比如下载到30
 %才报错，而不是每次都10%几就报错。另外如果代码报错暂停了，直接重新运行就行了，不需要修改啥。
 
 我又添加了一个报错机制，可以自动重新申请几次，这样就不会报错了，昨天实验来看，可以一直下载到100 %的数据，下载到一小半自动断掉。我已经实验了两次，都可以每次下载100%数据。
