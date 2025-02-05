@@ -3,7 +3,7 @@ import logging
 from argparse import ArgumentParser
 from downloader import Downloader
 
-#测试
+
 def get_logger():
     log_handler = logging.StreamHandler(sys.stdout)
     log_formatter = logging.Formatter(
