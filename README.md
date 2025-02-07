@@ -4,7 +4,7 @@ This repo allows downloading the entire Saarbruecken Voice Database，based on t
 此存储库允许下载整个萨尔布吕肯语音数据库。以这个仓库为基础 (https://github.com/rijulg/svd-downloader).
 
 
-I just made a simple change, and then you can run it directly in pycharm instead of running it in the command line (I personally don't like the command line), that is, you don't need to enter parameters, just run the _main_.py file directly. (At this time, an svd_downloader folder will be automatically generated in the current code directory to save the data set file)
+I changed part of it, and then you can run it directly in pycharm instead of running it in the command line (I personally don't like the command line), that is, you don't need to enter parameters, just run the _main_.py file directly. (At this time, an svd_downloader folder will be automatically generated in the current code directory to save the data set file)
 The second modification is to add a request header to the downloader.
 py file. Without adding the request header, an error will be reported every time 10% of the download is downloaded. After adding it, there may still be an error, but you can download more and then report an error, such as downloading to 30% before reporting an error, instead of reporting an error every time 10% or so. In addition, if the code reports an error and pauses, just rerun it directly, no need to modify anything.
 I also added an error reporting mechanism, which can automatically reapply several times, so that there will be no error. From yesterday's experiment, it can download up to 100% of the data, and automatically disconnect when downloading half of it. I have tried it twice, and I can download 100% of the data every time.
