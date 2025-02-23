@@ -3,7 +3,7 @@ from numba import cuda
 import math
 import time
 
-#  创建一个更复杂的矩阵乘法
+# 创建一个更复杂的矩阵乘法
 @cuda.jit
 def gpu_matrix_multiply(A, B, C):
     # 计算线程的二维索引
