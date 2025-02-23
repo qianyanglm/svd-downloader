@@ -1,46 +1,88 @@
 import numpy as np
 from numba import cuda
-import math
-import time
 
-# 创建一个更复杂的矩阵乘法
 @cuda.jit
 def gpu_matrix_multiply(A, B, C):
-    # 计算线程的二维索引
     row, col = cuda.grid(2)
+    if row < C.shape[0] and col < C.shape[1]:
+        temp = 0.0
+        for k in range(A.shape[1]):
+            temp += A[row, k] * B[k, col]
+        C[row, col] = temp
 
+def main():
+    # 配置矩阵维度（约1.5GB/矩阵）
+    matrix_size = 15000  # 调整此值至显存容量的70%左右
+    dtype = np.float32
+
+    try:
+        # 预分配内存
+        A = np.random.rand(matrix_size, matrix_size).astype(dtype)
+        B = np.random.rand(matrix_size, matrix_size).astype(dtype)
+        C = np.zeros((matrix_size, matrix_size), dtype=dtype)
+    except MemoryError:
+        print("内存不足，请减小matrix_size")
+        return
+
+    # CUDA配置（优化后的线程布局）
+    threads_per_block = (32, 8)  # 256 threads/block
+    blocks_x = (A.shape[0] + threads_per_block[0] - 1) // threads_per_block[0]
+    blocks_y = (B.shape[1] + threads_per_block[1] - 1) // threads_per_block[1]
+
+    # 显式内存管理
+    stream = cuda.stream()
+    try:
+        d_A = cuda.to_device(A, stream=stream)
+        d_B = cuda.to_device(B, stream=stream)
+        d_C = cuda.device_array_like(C, stream=stream)
+    except cuda.cudadrv.driver.CudaAPIError as e:
+        print(f"显存不足: {e}")
+        return
+
+    # 执行内核
+    gpu_matrix_multiply[(blocks_x, blocks_y), threads_per_block, stream](d_A, d_B, d_C)
+
+    # 异步传输结果
+    d_C.copy_to_host(C, stream=stream)
+    stream.synchronize()
+
+if __name__ == "__main__":
+    main()
+import numpy as np
+from numba import cuda
+
+# 使用之前定义的GPU矩阵乘法函数
+@cuda.jit
+def gpu_matrix_multiply(A, B, C):
+    row, col = cuda.grid(2)
     if row < C.shape[0] and col < C.shape[1]:
         temp = 0
         for k in range(A.shape[1]):
             temp += A[row, k] * B[k, col]
         C[row, col] = temp
 
-# 设置更大的矩阵维度（例如 16384）
-n = 4096*2  # 增大矩阵大小到 16384x16384
-A = np.random.random((n, n)).astype(np.float64)  # 使用 float64 增加内存占用
-B = np.random.random((n, n)).astype(np.float64)  # 使用 float64 增加内存占用
-C = np.zeros((n, n), dtype=np.float64)  # 使用 float64 增加内存占用
+# 初始化数据
+A = np.random.rand(3, 3).astype(np.float32)
+B = np.random.rand(3, 3).astype(np.float32)
+C = np.zeros((3, 3), dtype=np.float32)
 
-# 将数据传输到设备
-A_device = cuda.to_device(A)
-B_device = cuda.to_device(B)
-C_device = cuda.to_device(C)
+# 配置CUDA线程
+threads_per_block = (16, 16)
+blocks_per_grid_x = (A.shape[0] + threads_per_block[0] - 1) // threads_per_block[0]
+blocks_per_grid_y = (B.shape[1] + threads_per_block[1] - 1) // threads_per_block[1]
+blocks_per_grid = (blocks_per_grid_x, blocks_per_grid_y)
 
-# 设置线程块和网格的大小
-threadsperblock = (32, 32)
-blockspergrid = (math.ceil(n / threadsperblock[0]), math.ceil(n / threadsperblock[1]))
+# 传输数据到设备
+d_A = cuda.to_device(A)
+d_B = cuda.to_device(B)
+d_C = cuda.to_device(C)
 
-# 记录开始时间
-start_time = time.time()
+# 启动内核
+gpu_matrix_multiply[blocks_per_grid, threads_per_block](d_A, d_B, d_C)
 
-# 调用 GPU 进行矩阵乘法
-gpu_matrix_multiply[blockspergrid, threadsperblock](A_device, B_device, C_device)
+# 取回结果
+d_C.copy_to_host(C)
 
-# 将结果从 GPU 拷贝回主机
-C_device.copy_to_host(C)
-
-# 记录结束时间
-end_time = time.time()
-
-# 打印计算时间
-print(f"Matrix multiplication completed in {end_time - start_time:.4f} seconds.")
+# 验证结果（可选）
+expected = np.dot(A, B)
+print("GPU结果与CPU结果是否一致:", np.allclose(C, expected, atol=1e-5))
