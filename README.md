@@ -1,4 +1,9 @@
 需要数据集发我谷歌邮箱，我会回复邮件的。
+下面链接失效了就发我邮箱
+【超级会员V8】我通过百度网盘分享的文件：svd_down....zip
+链接：https://pan.baidu.com/s/1ctK3ttQq001AGoyPDH4flA 
+提取码：61Pe 
+复制这段内容打开「百度网盘APP即可获取」
 
 # svd-downloader
 
