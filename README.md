@@ -1,3 +1,5 @@
+需要数据集发我谷歌邮箱，我会回复邮件的。
+
 # svd-downloader
 
 This repo allows downloading the entire Saarbruecken Voice Database，based on this repository(https://github.com/rijulg/svd-downloader)
